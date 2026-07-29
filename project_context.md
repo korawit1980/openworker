@@ -160,6 +160,8 @@ Python command-line entry points ที่ประกาศใน `pyproject.to
 - Python 3.10 ขึ้นไป
 - Node.js 20 ขึ้นไป
 - Rust toolchain ผ่าน `rustup` เมื่อต้องการรันหรือ build Tauri desktop app
+- Windows desktop builds ต้องมี MSVC C++ build tools และ LLVM/libclang
+  (`winget install --exact --id LLVM.LLVM`) สำหรับ speech-to-text engine
 
 ### Bootstrap ตาม repository
 
@@ -289,6 +291,10 @@ CI ปัจจุบันตรวจสามส่วน:
 ควรใช้บน OS เป้าหมายและอ่าน prerequisite ที่หัวไฟล์ก่อนรัน การทำ release,
 code signing, notarization และ auto-update manifest ต้องใช้ credentials
 เฉพาะของผู้ดูแลโครงการ
+
+บน Windows สคริปต์จะค้นหา Rust, Visual Studio Developer Shell และ
+`libclang.dll` จากตำแหน่งติดตั้งมาตรฐานให้โดยอัตโนมัติ ผลลัพธ์อยู่ใต้
+`surfaces/gui/src-tauri/target/release/bundle/` เป็น NSIS `.exe` และ MSI
 
 ## 12. ข้อจำกัดและข้อควรระวัง
 

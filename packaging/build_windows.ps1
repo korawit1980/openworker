@@ -11,11 +11,14 @@
 
   Prerequisites (see the toolchain notes in the PR/plan):
     - Rust (rustup) with the x86_64-pc-windows-msvc target + the MSVC C++ build tools (link.exe).
+      The script adds rustup's default cargo bin to PATH and loads the latest Visual Studio
+      Developer Shell automatically when those tools are installed in their standard locations.
     - Node + npm (frontend build).
     - A Python venv at platform\.venv with this package installed editable, plus pyinstaller.
       `typer` is needed only at build time: PyInstaller walks the `mcp` package and `mcp.cli`
       calls sys.exit() at import if typer is absent, which aborts the freeze.
         py -m venv .venv ; .\.venv\Scripts\pip install -e ".[bedrock]" pyinstaller tzdata typer
+    - LLVM/libclang for generating whisper-rs bindings (`winget install LLVM.LLVM`).
 
   The result is UNSIGNED — first launch shows a SmartScreen warning ("More info" -> "Run anyway").
   Authenticode signing is a later step.
@@ -43,8 +46,61 @@ function Require-Cmd($name) {
     }
 }
 
+function Initialize-NativeToolchain {
+    if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) {
+        $CargoBin = Join-Path $env:USERPROFILE ".cargo\bin"
+        if (Test-Path (Join-Path $CargoBin "rustc.exe")) {
+            $env:Path = "$CargoBin;$env:Path"
+        }
+    }
+
+    if (-not (Get-Command link.exe -ErrorAction SilentlyContinue)) {
+        $VsWhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+        if (Test-Path $VsWhere) {
+            $VsInstall = & $VsWhere -latest -products * `
+                -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+                -property installationPath
+            if ($VsInstall) {
+                $DevShell = Join-Path $VsInstall "Common7\Tools\Launch-VsDevShell.ps1"
+                if (Test-Path $DevShell) {
+                    & $DevShell -Arch amd64 -HostArch amd64 -SkipAutomaticLocation
+                }
+            }
+        }
+    }
+}
+
+function Resolve-LibClang {
+    $candidates = @()
+    if ($env:LIBCLANG_PATH) {
+        $candidates += $env:LIBCLANG_PATH
+    }
+    $candidates += @(
+        (Join-Path $env:ProgramFiles "LLVM\bin"),
+        (Join-Path $env:ProgramFiles "Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\bin"),
+        (Join-Path $env:ProgramFiles "Microsoft Visual Studio\2022\BuildTools\VC\Tools\Llvm\x64\bin")
+    )
+
+    foreach ($candidate in $candidates) {
+        if ($candidate -and (Test-Path (Join-Path $candidate "libclang.dll"))) {
+            $env:LIBCLANG_PATH = $candidate
+            Write-Host "==> using libclang from $candidate"
+            return
+        }
+    }
+
+    throw @"
+libclang.dll not found. Install LLVM, then open a new terminal:
+  winget install --exact --id LLVM.LLVM
+Or set LIBCLANG_PATH to the directory containing libclang.dll.
+"@
+}
+
+Initialize-NativeToolchain
 Require-Cmd rustc
-Require-Cmd npm
+Require-Cmd link.exe
+Require-Cmd npm.cmd
+Resolve-LibClang
 if (-not (Test-Path $PyInst)) {
     throw "PyInstaller not found at $PyInst. Create the venv and install deps (see header)."
 }
@@ -96,9 +152,13 @@ if ($env:TAURI_SIGNING_PRIVATE_KEY) {
 } else {
     Write-Host "    WARNING: no updater signing key - building WITHOUT auto-update artifacts (not releasable)." -ForegroundColor Yellow
 }
+
 Push-Location $Gui
 try {
-    & npm run tauri build -- --bundles $Bundles @UpdaterArgs
+    # Invoke the cmd shim explicitly. Recent npm PowerShell shims reconstruct
+    # `$MyInvocation.Statement` incorrectly when called through `&` inside another
+    # script, turning `npm` into `pm` and aborting before Tauri starts.
+    & npm.cmd run tauri build -- --bundles $Bundles @UpdaterArgs
     if ($LASTEXITCODE -ne 0) { throw "tauri build failed (exit $LASTEXITCODE)" }
 }
 finally {

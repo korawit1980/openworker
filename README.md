@@ -65,6 +65,8 @@ OpenWorker is local-first. Everything lives on your machine: the agent loop, you
 ## Run from source
 
 Prerequisites: Python 3.10+, Node 20+, and (for the desktop shell) the Rust toolchain via [rustup](https://rustup.rs/).
+Windows desktop builds also need the MSVC C++ build tools and LLVM/libclang
+(`winget install --exact --id LLVM.LLVM`) for the local speech-to-text engine.
 
 ```shell
 git clone https://github.com/andrewyng/openworker

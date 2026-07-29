@@ -155,6 +155,17 @@ Python command-line entry points ที่ประกาศใน `pyproject.to
 4. เพิ่ม model API key ใน Settings หรือกำหนด endpoint ของ Ollama
 5. เชื่อม integrations เฉพาะที่ต้องการใช้งาน
 
+#### ใช้ Ollama แบบ local บน Windows 11
+
+1. ดาวน์โหลดและติดตั้ง Ollama จาก `https://ollama.com/download/windows`
+2. เปิด PowerShell แล้วเลือกดาวน์โหลดโมเดล:
+   - เครื่องที่มีทรัพยากรจำกัด: `ollama pull qwen3:4b` (ประมาณ 2.5 GB)
+   - โมเดล coding ที่ OpenWorker ตรวจสอบแล้ว: `ollama pull qwen3-coder:30b`
+     (ประมาณ 19 GB และต้องใช้ RAM/พื้นที่มากกว่า)
+3. ใน OpenWorker เลือก **Ollama (local models)** ใช้ URL
+   `http://localhost:11434` แล้วกด **Detect**
+4. ไม่ต้องใช้ API key และโมเดลจะเก็บอยู่ในเครื่องของผู้ใช้
+
 ### macOS
 
 1. ใช้ Mac แบบ Apple Silicon และ macOS 12 ขึ้นไป

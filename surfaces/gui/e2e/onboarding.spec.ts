@@ -40,6 +40,27 @@ test("provider gallery: cards wear their state; Next arms off stored credentials
   await expect(page.getByTestId("ob-step-tools")).toBeVisible();
 });
 
+test("Ollama form teaches the Windows local-model setup flow", async ({ page }) => {
+  await openOnboarding(page);
+
+  await page.getByTestId("ob-provider-ollama").click();
+  await expect(page.getByTestId("ob-ollama-guide")).toBeVisible();
+  await expect(page.getByTestId("ob-ollama-download")).toContainText(
+    "Download Ollama for Windows",
+  );
+  await expect(page.getByTestId("ob-ollama-copy-starter")).toContainText(
+    "ollama pull qwen3:4b",
+  );
+  await expect(page.getByTestId("ob-ollama-copy-recommended")).toContainText(
+    "ollama pull qwen3-coder:30b",
+  );
+  await expect(page.getByTestId("ob-field-base_url")).toHaveValue(
+    "http://127.0.0.1:11434",
+  );
+  await expect(page.getByTestId("ob-test")).toHaveText("Detect");
+  await expect(page.getByTestId("ob-step-model")).not.toContainText("this Mac");
+});
+
 test("key form: Test verifies, saves, and returns to the gallery with the ✓", async ({
   page,
 }) => {

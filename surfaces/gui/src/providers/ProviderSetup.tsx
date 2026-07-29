@@ -34,6 +34,97 @@ export const KEY_HELP: Record<string, { url: string; label: string }> = {
   xai: { url: "https://console.x.ai", label: "console.x.ai" },
 };
 
+export const OLLAMA_DOWNLOAD_URL = "https://ollama.com/download/windows";
+export const OLLAMA_STARTER_COMMAND = "ollama pull qwen3:4b";
+export const OLLAMA_RECOMMENDED_COMMAND = "ollama pull qwen3-coder:30b";
+
+function OllamaCommand({
+  command,
+  note,
+  tp,
+  testId,
+}: {
+  command: string;
+  note: string;
+  tp: string;
+  testId: string;
+}) {
+  return (
+    <div className="mt-1.5 flex items-center gap-2">
+      <button
+        className="inline-flex min-w-0 items-center gap-2 rounded-lg border border-line bg-panel px-2.5 py-1.5 text-left text-[11.5px] font-mono text-ink hover:border-lineStrong"
+        onClick={() => void navigator.clipboard?.writeText(command)}
+        title="Copy command"
+        aria-label={`Copy ${command}`}
+        data-testid={`${tp}-${testId}`}
+      >
+        <span className="truncate">{command}</span>
+        <span className="shrink-0 font-sans text-[11px] text-faint">⧉</span>
+      </button>
+      <span className="text-[10.5px] text-faint">{note}</span>
+    </div>
+  );
+}
+
+function OllamaInstallGuide({ tp }: { tp: string }) {
+  const windows = typeof navigator !== "undefined" && /Windows/i.test(navigator.userAgent);
+  return (
+    <div
+      className="mt-3 rounded-xl border border-line bg-paper/60 px-3.5 py-3"
+      data-testid={`${tp}-ollama-guide`}
+    >
+      <div className="text-[12.5px] font-semibold text-ink">
+        Set up Ollama locally{windows ? " on Windows 11" : ""}
+      </div>
+      <ol className="mt-2 space-y-2 text-[11.5px] text-muted">
+        <li className="flex gap-2">
+          <span className="font-semibold text-accent">1.</span>
+          <span>
+            <button
+              className="font-medium text-ink underline decoration-line underline-offset-2 hover:text-accent"
+              onClick={() => openExternal(OLLAMA_DOWNLOAD_URL)}
+              data-testid={`${tp}-ollama-download`}
+            >
+              Download Ollama for Windows ↗
+            </button>{" "}
+            and run <span className="font-mono text-ink">OllamaSetup.exe</span>. It installs for
+            your Windows account without an API key.
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="font-semibold text-accent">2.</span>
+          <span className="min-w-0">
+            Open PowerShell and download one local model:
+            <OllamaCommand
+              command={OLLAMA_STARTER_COMMAND}
+              note="starter · about 2.5 GB"
+              tp={tp}
+              testId="ollama-copy-starter"
+            />
+            <OllamaCommand
+              command={OLLAMA_RECOMMENDED_COMMAND}
+              note="verified · about 19 GB"
+              tp={tp}
+              testId="ollama-copy-recommended"
+            />
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="font-semibold text-accent">3.</span>
+          <span>
+            Keep the default URL <span className="font-mono text-ink">http://localhost:11434</span>,
+            then click <span className="font-medium text-ink">Detect</span>. OpenWorker adds the{" "}
+            <span className="font-mono text-ink">/v1</span> path automatically.
+          </span>
+        </li>
+      </ol>
+      <p className="mt-2 text-[10.5px] text-faint">
+        Models stay on this device. Choose the starter model for lower RAM and disk usage.
+      </p>
+    </div>
+  );
+}
+
 export type Verify = { state: "idle" | "testing" | "ok" | "error"; msg?: string };
 
 /** Brand chip: always a light plate so multicolor marks read on any theme. */
@@ -498,15 +589,7 @@ export function ProviderForm({
         </p>
       )}
       {info && !info.needs_key && (
-        <p className="text-[11.5px] text-faint mt-2">
-          No API key needed — Ollama runs models on this Mac.{" "}
-          <button
-            className="text-muted underline decoration-line underline-offset-2 hover:text-ink"
-            onClick={() => openExternal("https://ollama.com/download")}
-          >
-            Install Ollama ↗
-          </button>
-        </p>
+        <OllamaInstallGuide tp={tp} />
       )}
 
       {/* Custom endpoint (keyed providers only): a quiet disclosure BELOW the key help,

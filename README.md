@@ -57,6 +57,20 @@ Model access is yours: pick a provider, paste your key, switch anytime. Supporte
 
 A curated model list marks what we've verified for tool-calling work. Adding any model string works at your own risk.
 
+### Use Ollama locally on Windows 11
+
+1. Download and run [Ollama for Windows](https://ollama.com/download/windows).
+   It installs for the current Windows account and does not require an API key.
+2. Open PowerShell and pull a model. For a smaller starter model (about 2.5 GB),
+   run `ollama pull qwen3:4b`. For OpenWorker's verified coding model (about
+   19 GB), run `ollama pull qwen3-coder:30b`.
+3. In OpenWorker, choose **Ollama (local models)**, keep
+   `http://localhost:11434`, and click **Detect**. OpenWorker adds the
+   OpenAI-compatible `/v1` path automatically.
+
+The models stay on your device. The larger model needs substantially more RAM
+and disk space; start with `qwen3:4b` if you are unsure.
+
 ## Privacy
 
 OpenWorker is local-first. Everything lives on your machine: the agent loop, your conversations, connector tokens, and model keys - all in the app's local secret store. The only cloud piece is a small service that brokers OAuth handshakes for connectors. You can always use the App without signing-in - use the connectors via manually-created credentials/API-keys.

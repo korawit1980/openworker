@@ -138,6 +138,19 @@ Copy-Item -Recurse -Force $Src $Dst
 Write-Host "    -> $Dst"
 
 Write-Host "==> [3/3] tauri build (--bundles $Bundles)" -ForegroundColor Cyan
+$BundleDir = Join-Path $Gui "src-tauri\target\release\bundle"
+$AllowedBundles = @("nsis", "msi")
+foreach ($BundleName in ($Bundles -split ",")) {
+    $BundleName = $BundleName.Trim().ToLowerInvariant()
+    if ($BundleName -notin $AllowedBundles) {
+        throw "Unsupported Windows bundle '$BundleName'. Allowed values: $($AllowedBundles -join ', ')."
+    }
+    $StaleBundleDir = Join-Path $BundleDir $BundleName
+    if (Test-Path $StaleBundleDir) {
+        Remove-Item -LiteralPath $StaleBundleDir -Recurse -Force
+    }
+}
+
 # Auto-update artifacts (NSIS setup .exe + minisign .sig): produced only when the updater
 # signing key env is present (CI secret TAURI_SIGNING_PRIVATE_KEY). Keyless builds skip
 # the overlay so dev builds keep working; keyless RELEASES strand installs without
@@ -165,7 +178,6 @@ finally {
     Pop-Location
 }
 
-$BundleDir = Join-Path $Gui "src-tauri\target\release\bundle"
 Write-Host ""
 Write-Host "Done. Installers under: $BundleDir" -ForegroundColor Green
 Get-ChildItem -Path $BundleDir -Recurse -Include *.exe, *.msi -ErrorAction SilentlyContinue |

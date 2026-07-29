@@ -3,8 +3,8 @@
 
 Run by the release CI job after all platform builds are staged in one directory:
 
-    python3 make_update_manifest.py --version 0.1.2 --tag v0.1.2 \
-        --repo andrewyng/aisuite --dist dist/ --out dist/latest.json
+    python3 make_update_manifest.py --version 0.1.0 --tag v0.1.0 \
+        --repo korawit1980/openworker --dist dist/ --out dist/latest.json
 
 Looks for the updater artifacts by their STABLE names (the same names release.yml
 uploads):
@@ -18,9 +18,9 @@ or a half-published release would mix versions. Platforms whose artifact or .sig
 missing are SKIPPED with a warning (e.g. a mac-only hotfix release), so shipped apps
 on other platforms simply see no update rather than a broken one.
 
-The desktop app finds this file through https://download.openworker.com/latest.json
-(branded redirect) falling back to the repo's releases/latest/download/latest.json —
-see tauri.conf.json `plugins.updater.endpoints`.
+The desktop app finds this file through the fork's
+`releases/latest/download/latest.json` endpoint configured in
+tauri.conf.json `plugins.updater.endpoints`.
 """
 
 from __future__ import annotations

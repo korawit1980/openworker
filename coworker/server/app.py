@@ -148,6 +148,7 @@ _CONNECT_FAILED_DETAIL = (
     "Close this tab and try again from OpenWorker."
 )
 
+from .. import __version__
 from ..attachments import (
     MAX_ATTACHMENTS as _MAX_ATTACHMENTS,
     MAX_IMAGE_CHARS,
@@ -178,7 +179,7 @@ def create_app(manager: SessionManager) -> FastAPI:
         yield
         await manager.aclose()  # stop gateway + close MCP connections on shutdown
 
-    app = FastAPI(title="coworker", version="0.0.0", lifespan=lifespan)
+    app = FastAPI(title="coworker", version=__version__, lifespan=lifespan)
     api_token = os.environ.get("COWORKER_API_TOKEN", "")
     tokenless_paths = {
         "/v1/health",

@@ -22,6 +22,19 @@ OpenWorker คือแอป AI coworker แบบโอเพนซอร์�
 
 โครงการอยู่ในสถานะ Open Beta และใช้สัญญาอนุญาต MIT
 
+### Fork identity และ version
+
+repository นี้เป็น fork ภายใต้ `korawit1980/openworker` และเริ่มลำดับ release
+ของตนเองที่ `0.1.0` โดยใช้ `surfaces/gui/src-tauri/tauri.conf.json` เป็น
+source of truth สำหรับ desktop release และชื่อ installer
+
+- Desktop identifier: `io.github.korawit1980.openworker`
+- Windows publisher: `Korawit1980`
+- Release tags ใช้รูปแบบ `v<version>` เช่น `v0.1.0`
+- Download และ updater endpoints ต้องชี้ไปที่ `korawit1980/openworker`
+- ก่อนเปิดใช้ auto-update artifacts ต้องสร้าง updater signing key ของ fork
+  และแทนที่ public key เดิมใน Tauri config ห้าม commit private key
+
 ## 2. หลักการสำคัญของผลิตภัณฑ์
 
 ### Finished work
@@ -53,7 +66,7 @@ inbox แทนการตัดสินใจแทนผู้ใช้
 | ระบบปฏิบัติการ | การรองรับอย่างเป็นทางการ | หมายเหตุ |
 | --- | --- | --- |
 | Windows 10/11 x64 | มีตัวติดตั้ง | สร้าง `.exe`/NSIS และ MSI; README ระบุว่า build อาจยังไม่ code-sign จึงอาจพบ SmartScreen |
-| macOS 12+ Apple Silicon | มีตัวติดตั้ง | ใช้ `.dmg`, signed/notarized และรองรับ auto-update |
+| macOS 12+ Apple Silicon | release workflow สร้าง `.dmg` ได้ | signing, notarization และ auto-update ต้องใช้ credentials/signing key ของ fork |
 | Linux | ยังไม่มีตัวติดตั้ง desktop อย่างเป็นทางการ | Python server และ browser UI สามารถทดลองรันจาก source ได้ แต่ repository ไม่มี Linux packaging script |
 
 ## 4. ภาษาหลักและเทคโนโลยี
@@ -136,7 +149,7 @@ Python command-line entry points ที่ประกาศใน `pyproject.to
 
 ### Windows
 
-1. ดาวน์โหลดจาก `https://download.openworker.com/windows`
+1. ดาวน์โหลดจาก `https://github.com/korawit1980/openworker/releases/latest/download/OpenWorker-windows-setup.exe`
 2. เปิดตัวติดตั้งและตรวจสอบแหล่งที่มาก่อนยืนยัน SmartScreen หากระบบเตือน
 3. เปิด OpenWorker
 4. เพิ่ม model API key ใน Settings หรือกำหนด endpoint ของ Ollama
@@ -145,7 +158,7 @@ Python command-line entry points ที่ประกาศใน `pyproject.to
 ### macOS
 
 1. ใช้ Mac แบบ Apple Silicon และ macOS 12 ขึ้นไป
-2. ดาวน์โหลดจาก `https://download.openworker.com/mac`
+2. ดาวน์โหลดจาก `https://github.com/korawit1980/openworker/releases/latest/download/OpenWorker-macos-arm64.dmg`
 3. เปิด `.dmg` และลาก OpenWorker ไปยัง Applications
 4. เปิดแอปและตั้งค่า model provider หรือ Ollama
 

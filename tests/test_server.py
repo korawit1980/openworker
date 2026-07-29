@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
+from coworker import __version__
 from coworker.providers import (
     AssistantTurn,
     ModelCapabilities,
@@ -42,6 +43,11 @@ def _client(tmp_path, turns):
 
 
 # -- REST -----------------------------------------------------------------------
+
+
+def test_app_reports_runtime_version(tmp_path):
+    manager = SessionManager(workspace=tmp_path, provider=ScriptedProvider([]))
+    assert create_app(manager).version == __version__ == "0.1.0"
 
 
 def test_chat_completions_openai_shape(tmp_path):

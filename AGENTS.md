@@ -99,6 +99,15 @@ capability matrix ได้ อย่าให้ connector implementation ข�
 
 ## 5. Compatibility และ Contracts
 
+- repository นี้เป็น fork `korawit1980/openworker` และเริ่ม release line ที่ `0.1.0`
+- desktop identifier คือ `io.github.korawit1980.openworker`; ห้ามเปลี่ยนกลับไปใช้
+  identifier หรือ updater endpoint ของ upstream
+- `surfaces/gui/src-tauri/tauri.conf.json` เป็น source of truth ของ release version
+  และต้อง sync first-party versions ใน `pyproject.toml`, `coworker/__init__.py`,
+  `surfaces/gui/package.json`, package lock และ Rust manifests ที่เกี่ยวข้อง
+- release tag ต้องตรงกับ Tauri version เช่น `v0.1.0`
+- auto-update release ต้องใช้ signing key ที่ fork เป็นเจ้าของ ห้ามใช้หรือ commit
+  upstream/private signing keys
 - Python ขั้นต่ำคือ 3.10; CI ใช้ Python 3.12
 - Node.js ขั้นต่ำคือ 20
 - GUI ใช้ React 18, TypeScript, Vite และ Tauri 2
